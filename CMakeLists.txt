@@ -4,9 +4,9 @@ cmake_minimum_required(VERSION 2.8.3)
 find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
-PROTOBUF_CATKIN_GENERATE_CPP(PROTO_SRCS PROTO_HDRS proto/node.proto
-                                                   proto/vocabulary.proto
-                                                   proto/word.proto)
+PROTOBUF_CATKIN_GENERATE_CPP(PROTO_SRCS PROTO_HDRS proto/brief_node.proto
+                                                   proto/brief_vocabulary.proto
+                                                   proto/brief_word.proto)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(SRCS 
