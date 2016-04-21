@@ -10,15 +10,15 @@
 #ifndef __D_T_F_ORB__
 #define __D_T_F_ORB__
 
-#include <opencv/cv.h>
+#include <opencv2/core/core.hpp>
 #include <vector>
 #include <string>
 
-#include "FClass.h"
+#include "DBoW2/FClass.h"
 
 namespace DBoW2 {
 
-/// Functions to manipulate BRIEF descriptors
+/// Functions to manipulate ORB descriptors
 class FORB: protected FClass
 {
 public:
@@ -28,7 +28,7 @@ public:
   /// Pointer to a single descriptor
   typedef const TDescriptor *pDescriptor;
   /// Descriptor length (in bytes)
-  static const int L = 32;
+  static const int L;
 
   /**
    * Calculates the mean value of a set of descriptors
@@ -44,8 +44,8 @@ public:
    * @param b
    * @return distance
    */
-  static double distance(const TDescriptor &a, const TDescriptor &b);
-  
+  static int distance(const TDescriptor &a, const TDescriptor &b);
+
   /**
    * Returns a string version of the descriptor
    * @param a descriptor
