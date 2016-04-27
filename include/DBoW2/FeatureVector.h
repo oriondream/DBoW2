@@ -11,6 +11,7 @@
 #define __D_T_FEATURE_VECTOR__
 
 #include "DBoW2/BowVector.h"
+#include <functional>
 #include <map>
 #include <vector>
 #include <iostream>
@@ -50,6 +51,11 @@ public:
 
   // Remove all entries corresponding to non-remaining indices.
   void filter(const std::vector<unsigned int>& remaining_indices);
+
+  void forEachCommonNode(
+      const FeatureVector& other, const std::function<void(
+          const NodeId& node_id, const std::vector<unsigned int>& own_indices,
+          const std::vector<unsigned int>& other_indices)>& action) const;
 };
 
 } // namespace DBoW2

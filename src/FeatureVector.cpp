@@ -106,6 +106,34 @@ void FeatureVector::filter(const std::vector<unsigned int>& remaining_indices)
   swap(filtered);
 }
 
+void FeatureVector::forEachCommonNode(
+      const FeatureVector& other, const std::function<void(
+          const NodeId& node_id, const std::vector<unsigned int>& own_indices,
+          const std::vector<unsigned int>& other_indices)>& action) const
+{
+  CHECK(action);
+  const_iterator own_it = begin();
+  const_iterator other_it = other.begin();
+
+  while (own_it != end() && other_it != other.end())
+  {
+    if (own_it->first == other_it->first)
+    {
+      action(own_it->first, own_it->second, other_it->second);
+      ++own_it;
+      ++other_it;
+    }
+    else if (own_it->first < other_it->first)
+    {
+      own_it = lower_bound(other_it->first);
+    }
+    else
+    {
+      other_it = other.lower_bound(own_it->first);
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 
 } // namespace DBoW2
