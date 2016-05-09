@@ -17,6 +17,7 @@ set(SRCS
 add_definitions("-std=c++11")
 
 cs_add_library(${PROJECT_NAME} ${SRCS} ${PROTO_SRCS})
+target_link_libraries(${PROJECT_NAME} opencv_nonfree)
 
 cs_add_executable(voc_to_proto src/voc_to_proto.cpp)
 target_link_libraries(voc_to_proto ${PROJECT_NAME})
