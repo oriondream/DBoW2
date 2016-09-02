@@ -161,6 +161,18 @@ public:
   virtual WordId transform(const TDescriptor& feature) const;
   
   /**
+   * Returns the word id associated to a feature
+   * @param feature
+   * @param id (out) word id
+   * @param weight (out) word weight
+   * @param nid (out) if given, id of the node "levelsup" levels up
+   * @param levelsup
+   */
+  virtual void transform(const TDescriptor &feature,
+                         WordId &id, WordValue &weight, NodeId* nid = NULL,
+                         int levelsup = 0) const;
+
+  /**
    * Returns the score of two vectors
    * @param a vector
    * @param b vector
@@ -355,17 +367,6 @@ protected:
   void getFeatures(
     const vector<vector<TDescriptor> > &training_features, 
     vector<pDescriptor> &features) const;
-
-  /**
-   * Returns the word id associated to a feature
-   * @param feature
-   * @param id (out) word id
-   * @param weight (out) word weight
-   * @param nid (out) if given, id of the node "levelsup" levels up
-   * @param levelsup
-   */
-  virtual void transform(const TDescriptor &feature, 
-    WordId &id, WordValue &weight, NodeId* nid = NULL, int levelsup = 0) const;
 
   /**
    * Returns the word id associated to a feature
