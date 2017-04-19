@@ -14,7 +14,7 @@ set(SRCS
   src/FeatureVector.cpp src/QueryResults.cpp  src/ScoringObject.cpp
   src/TemplatedVocabulary.cpp)
 
-add_definitions("-std=c++11")
+add_definitions(-std=c++11 -O3)
 
 cs_add_library(${PROJECT_NAME} ${SRCS} ${PROTO_SRCS})
 target_link_libraries(${PROJECT_NAME} opencv_nonfree)

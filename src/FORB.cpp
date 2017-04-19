@@ -9,11 +9,16 @@
  *
  */
  
+#if __SSE2__
+#include <emmintrin.h>
+#endif
 #include <vector>
 #include <string>
 #include <sstream>
 #include <stdint.h>
 #include <limits.h>
+
+#include <glog/logging.h>
 
 #include "DUtils/DUtils.h"
 #include "DVision/DVision.h"
@@ -80,16 +85,67 @@ void FORB::meanValue(const std::vector<FORB::pDescriptor> &descriptors,
 
 // --------------------------------------------------------------------------
   
+#if __SSE2__
+
+// Courtesy of
+// http://stackoverflow.com/questions/17354971/fast-counting-the-number-of-set-bits-in-m128i-register
+namespace FORB_internal {
+
+const __m128i popcount_mask1 = _mm_set1_epi8(0x77);
+const __m128i popcount_mask2 = _mm_set1_epi8(0x0F);
+inline __m128i popcnt8(__m128i x) {
+    __m128i n;
+    // Count bits in each 4-bit field.
+    n = _mm_srli_epi64(x, 1);
+    n = _mm_and_si128(popcount_mask1, n);
+    x = _mm_sub_epi8(x, n);
+    n = _mm_srli_epi64(n, 1);
+    n = _mm_and_si128(popcount_mask1, n);
+    x = _mm_sub_epi8(x, n);
+    n = _mm_srli_epi64(n, 1);
+    n = _mm_and_si128(popcount_mask1, n);
+    x = _mm_sub_epi8(x, n);
+    x = _mm_add_epi8(x, _mm_srli_epi16(x, 4));
+    x = _mm_and_si128(popcount_mask2, x);
+    return x;
+}
+
+inline __m128i popcnt64(__m128i n) {
+    const __m128i cnt8 = popcnt8(n);
+    return _mm_sad_epu8(cnt8, _mm_setzero_si128());
+}
+
+inline int popcnt128(__m128i n) {
+    const __m128i cnt64 = popcnt64(n);
+    const __m128i cnt64_hi = _mm_unpackhi_epi64(cnt64, cnt64);
+    const __m128i cnt128 = _mm_add_epi32(cnt64, cnt64_hi);
+    return _mm_cvtsi128_si32(cnt128);
+}
+
+}  // namespace FORB_internal
+
+#endif  // __SSE2__
+
 int FORB::distance(const FORB::TDescriptor &a,
   const FORB::TDescriptor &b)
 {
+  int dist=0;
+
+#if __SSE2__
+  for (int i = 0; i < 8; i += 4)
+  {
+    const __m128i* ai = (const __m128i*)(a.ptr<int32_t>() + i);
+    const __m128i* bi = (const __m128i*)(b.ptr<int32_t>() + i);
+
+    __m128i v = _mm_xor_si128(*ai, *bi);
+    dist += FORB_internal::popcnt128(v);
+  }
+#else
   // Bit set count operation from
   // http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
 
   const int *pa = a.ptr<int32_t>();
   const int *pb = b.ptr<int32_t>();
-
-  int dist=0;
 
   for(int i=0; i<8; i++, pa++, pb++)
   {
@@ -98,6 +154,7 @@ int FORB::distance(const FORB::TDescriptor &a,
       v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
       dist += (((v + (v >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
   }
+#endif
 
   return dist;
 }
