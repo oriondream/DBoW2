@@ -16,7 +16,10 @@
 #include "DUtilsCV/DUtilsCV.h" // defines macros CVXX
 #include "DVision/DVision.h"
 
-// OpenCV
+#include <opencv2/imgcodecs.hpp> 
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include<opencv2/xfeatures2d/nonfree.hpp>
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 #if CV24
@@ -76,7 +79,7 @@ void loadFeatures(vector<vector<vector<float> > > &features)
   features.clear();
   features.reserve(NIMAGES);
 
-  cv::SURF surf(400, 4, 2, EXTENDED_SURF);
+  cv::Ptr<cv::xfeatures2d::SURF> surf=cv::xfeatures2d::SURF::create(400, 4, 2, EXTENDED_SURF);
 
   cout << "Extracting SURF features..." << endl;
   for(int i = 0; i < NIMAGES; ++i)
@@ -89,10 +92,10 @@ void loadFeatures(vector<vector<vector<float> > > &features)
     vector<cv::KeyPoint> keypoints;
     vector<float> descriptors;
 
-    surf(image, mask, keypoints, descriptors);
+    surf->detectAndCompute(image, mask, keypoints, descriptors);
 
     features.push_back(vector<vector<float> >());
-    changeStructure(descriptors, features.back(), surf.descriptorSize());
+    changeStructure(descriptors, features.back(), surf->descriptorSize());
   }
 }
 

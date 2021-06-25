@@ -2,6 +2,7 @@ project(dbow2)
 cmake_minimum_required(VERSION 2.8.3)
 
 find_package(catkin_simple REQUIRED)
+find_package(OpenCV 3.2 REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
 PROTOBUF_CATKIN_GENERATE_CPP(PROTO_SRCS PROTO_HDRS proto/brief_node.proto
@@ -17,7 +18,7 @@ set(SRCS
 add_definitions(-std=c++11 -O3)
 
 cs_add_library(${PROJECT_NAME} ${SRCS} ${PROTO_SRCS})
-target_link_libraries(${PROJECT_NAME} opencv_nonfree)
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} opencv_contrib)
 
 cs_add_executable(voc_to_proto src/voc_to_proto.cpp)
 target_link_libraries(voc_to_proto ${PROJECT_NAME})
